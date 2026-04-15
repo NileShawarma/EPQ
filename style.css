@@ -1,0 +1,129 @@
+:root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: #1e1e2e;
+    --accent: #c8ff00;
+    --accent2: #00ffc8;
+    --text: #e8e8f0;
+    --muted: #555570;
+    --wall: #2a2a3e;
+    --player: #c8ff00;
+    --exit: #00ffc8;
+    --trail: rgba(200,255,0,0.07);
+}
+
+body{
+    background: var(--bg);
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+header{
+    text-align: center;
+}
+
+.logo span{
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 2.5rem;
+    font-weight: 700;
+    animation: text_shake_wave_thing 5s ease 1s 3 normal both, text_shake 10s ease 1s 3 normal both;
+}
+
+@keyframes text_shake_wave_thing {
+    0%,100% { letter-spacing:normal;}
+    50% { letter-spacing: 20px; }
+}
+
+@keyframes text_shake {
+    10%,30%,50%,70%,90% {
+        transform: translateY(10px)
+    }
+    20%,40%,60%,80% {
+        transform: translateY(-10px)
+    }
+}
+
+.logo span:nth-child(1) {animation-delay: 0s, 0s;}
+.logo span:nth-child(2) {animation-delay: 0s, 0.2s;}
+.logo span:nth-child(3) {animation-delay: 0s, 0.4s;}
+.logo span:nth-child(4) {animation-delay: 0s, 0.6s;}
+
+.tagline{
+    font-size: 0.75rem;
+    padding-top: 0.1rem;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+.tagline span{
+    animation: white_flashing_or_pulsing_text_thing 5s ease 1s infinite normal both;
+}
+@keyframes white_flashing_or_pulsing_text_thing {
+    0%,100% {color: var(--muted);}
+    75% {color: white;}
+}
+
+.hud {
+    display: flex;
+    justify-self: center;
+    gap: 20px;
+}
+
+canvas{
+    background: white;
+}
+
+.arrow-pad{
+    display: grid;
+    grid-template-columns: repeat(3,40px);
+    grid-template-rows: repeat(2,40px);
+    gap: 5px;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+}
+
+.arrow-pad button{
+    width: 40px;
+    height: 40px;
+    display: flex;align-items: center;justify-content: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 16px;
+    font-family: 'Space Mono', monospace;
+    transition: border-color 0.45s, color 0.45s, background 0.15s, transform 0.15s;
+}
+
+.arrow-pad button:hover{
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.arrow-pad button:active{
+    transform: scale(90%);
+    border-color: var(--accent2);
+    color: var(--accent2);
+}
+
+.hud-label {
+    font-size: 0.8rem;
+    padding-top: 0.1rem;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+.hud-val {
+    padding-top: 1rem;
+    color: var(--text);
+}
+.hud-val.accent{
+    color: var(--accent);
+}
+
+footer{
+    font-size: 0.75rem;
+    color: var(--muted);
+}
