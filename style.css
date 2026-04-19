@@ -75,6 +75,42 @@ header{
 canvas{
     background: white;
 }
+.controls{
+    display: flex;
+    justify-content: center;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    gap: 50px;
+}
+select{
+    width:190px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    background: var(--border);
+    border: 1px solid var(--surface);
+    color: var(--text);
+    border-radius: 0px;
+    font-family: 'Space Mono', monospace;
+}
+.btn.primary{
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 5px;
+    transition: border-color 0.45s, color 0.45s, background 0.45s, transform 0.15s;
+}
+.btn.primary:hover{
+    background: var(--accent);
+    color: var(--surface);
+    border-color: var(--surface);
+}
+.btn.btn.primary:active{
+    background: var(--accent2);
+    transform: scale(90%);
+}
 
 .arrow-pad{
     display: grid;
@@ -102,7 +138,8 @@ canvas{
     border-color: var(--accent);
     color: var(--accent);
 }
-.arrow-pad button:active{
+.arrow-pad button:active,
+.arrow-pad button.is-active{
     transform: scale(90%);
     border-color: var(--accent2);
     color: var(--accent2);
@@ -126,4 +163,5 @@ canvas{
 footer{
     font-size: 0.75rem;
     color: var(--muted);
+    text-align: center;
 }

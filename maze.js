@@ -1,51 +1,8 @@
-class Stack {
-    constructor() {
-        this.stack = [];
-        this.stack_size = 0;
-    }
-
-    push(item){
-        this.stack.push(item);
-        this.stack_size += 1
-    }
-
-    peek(){
-        if (this.stack_size == 0){
-            console.error("Stack is empty!");            
-        }
-
-        return this.stack.at(-1);
-    }
-
-    pop(){
-        if (this.stack_size == 0){
-            console.error("Stack is empty!");
-        }
-
-        this.stack_size -= 1;
-        return this.stack.pop()
-    }
-
-    is_empty(){
-        return (this.stack_size == 0)
-    }
-}
-
-const CANVAS_WIDTH = 500;
-const CANVAS_HEIGHT = 500;
-
-const canvas = document.getElementById('maze-canvas');
-const ctx = canvas.getContext('2d');
-
-canvas.width = CANVAS_WIDTH;
-canvas.height = CANVAS_HEIGHT;
-
 function setBackground(color){
     ctx.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
     ctx.fillStyle = color
     ctx.fillRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
 }
-
 
 function drawGrid(lineWidth, cellWidth, cellHeight, color){
     setBackground("#12121a")
@@ -70,9 +27,6 @@ function drawGrid(lineWidth, cellWidth, cellHeight, color){
         ctx.stroke();
     }
 }
-
-//drawGrid(3,50,50,"#2a2a3e")
-
 
 function dirArr_to_dirLetter(dirArr){
     const [r, c] = dirArr;
@@ -99,6 +53,119 @@ function dirLetter_to_dirArr(dirLet){
     }
 }
 
+function drawMazeWalls(maze, cellSize, wallColour, wallWidth) {
+    ctx.strokeStyle = wallColour;
+    ctx.lineWidth = wallWidth;
+    ctx.lineCap = "round";
+
+    for (let r = 0; r < maze.grid.length; r++) {
+        for (let c = 0; c < maze.grid[r].length; c++) {
+            let cell = maze.grid[r][c];
+            let x = c * cellSize;
+            let y = r * cellSize;
+
+            let top = y;
+            let bottom = y + cellSize;
+            let left = x;
+            let right = x + cellSize;
+
+            if (cell.Walls["N"] === 1) {
+                ctx.beginPath();
+                ctx.moveTo(left, top);
+                ctx.lineTo(right, top);
+                ctx.stroke();
+            }
+            if (cell.Walls["E"] === 1) {
+                ctx.beginPath();
+                ctx.moveTo(right, top);
+                ctx.lineTo(right, bottom);
+                ctx.stroke();
+            }
+            if (cell.Walls["S"] === 1) {
+                ctx.beginPath();
+                ctx.moveTo(left, bottom);
+                ctx.lineTo(right, bottom);
+                ctx.stroke();
+            }
+            if (cell.Walls["W"] === 1) {
+                ctx.beginPath();
+                ctx.moveTo(left, top);
+                ctx.lineTo(left, bottom);
+                ctx.stroke();
+            }
+        }
+    }
+}
+
+function drawPlayer(maze, cellSize, playerColour){
+   let playerCellID = maze.PlayerCell
+
+   let top = playerCellID["row"]*cellSize
+   let left = playerCellID["col"]*cellSize
+
+   let radius = cellSize/2
+   let centerY = top + radius
+   let centerX = left + radius
+
+   ctx.beginPath()
+   ctx.arc(centerX, centerY, radius*0.65, 0, 2 * Math.PI, false);
+   ctx.fillStyle = playerColour;
+   ctx.fill();
+
+   ctx.strokeStyle = "#000"
+   ctx.lineWidth = 2
+   ctx.stroke()
+}
+
+function restartGame(maze){
+   let COLS, ROWS;
+
+   COLS = document.getElementById("size-sel").value
+   ROWS = COLS
+
+   maze.generate_empty_grid(ROWS, COLS);
+   maze.generate_maze();
+
+   const CELL_SIZE = CANVAS_WIDTH / COLS; 
+
+   drawGrid(1, CELL_SIZE, CELL_SIZE, "#2a2a3e");
+
+   drawMazeWalls(maze, CELL_SIZE, "#3f3f5e", 4);
+
+   drawPlayer(maze, CELL_SIZE, "#c8ff00") ;
+}
+
+class Stack {
+    constructor() {
+        this.stack = [];
+        this.stack.length = 0;
+    }
+
+    push(item){
+        this.stack.push(item);
+    }
+
+    peek(){
+        if (this.stack.length == 0){
+            console.error("Stack is empty!");            
+        }
+
+        return this.stack.at(-1);
+    }
+
+    pop(){
+        if (this.stack.length == 0){
+            console.error("Stack is empty!");
+        }
+
+        return this.stack.pop()
+    }
+
+    is_empty(){
+        return (this.stack.length == 0)
+    }
+}
+
 class Maze {
     constructor() {
         this.grid = [];
@@ -110,10 +177,13 @@ class Maze {
         this.PLAYER = "*"
         this.STARTING_SQUARE_ID = {"row": 0, "col": 0}
         this.END_SQUARE_ID = {"row": 9, "col": 9}
+
+        this.PlayerCell = this.STARTING_SQUARE_ID
     }
 
     generate_empty_grid(rows, cols){
         let grid = [];
+        this.CELL_SIZE = CANVAS_WIDTH / cols; 
 
         for (let row = 0; row < rows; row ++){
             let full_row = [];
@@ -138,6 +208,7 @@ class Maze {
 
         let STARTING_CELL = this.get_cell_by_ID(this.STARTING_SQUARE_ID);
         STARTING_CELL.Visited = true;
+        this.PlayerCell = this.STARTING_SQUARE_ID
 
         let stack = new Stack();
         stack.push(STARTING_CELL);
@@ -172,33 +243,10 @@ class Maze {
 
             cell_to_go_to.Visited = true
         }
+
+        this.grid[0][0].State = this.PLAYER
     }
-    output_grid() {
-        const rows = this.grid.length;
-        const cols = this.grid[0].length;
-        // Create a buffer grid (2*nodes + 1) to account for walls between nodes
-        let display = Array.from({ length: rows * 2 + 1 }, () => 
-            Array(cols * 2 + 1).fill(this.WALL)
-        );
 
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                const cell = this.grid[r][c];
-                const dr = r * 2 + 1;
-                const dc = c * 2 + 1;
-
-                // Mark the cell path
-                display[dr][dc] = this.PATH;
-
-                // Check walls and punch holes in the display grid
-                if (cell.Walls["N"] === 0) display[dr - 1][dc] = this.PATH;
-                if (cell.Walls["S"] === 0) display[dr + 1][dc] = this.PATH;
-                if (cell.Walls["E"] === 0) display[dr][dc + 1] = this.PATH;
-                if (cell.Walls["W"] === 0) display[dr][dc - 1] = this.PATH;
-            }
-        }
-        return display;
-    }
     get_cell_by_ID(newID){
         let r = newID.row;
         let c = newID.col;
@@ -208,6 +256,34 @@ class Maze {
         }
 
         return -1;
+    }
+
+    move_player(dirLet){
+        let player_cell = this.get_cell_by_ID(this.PlayerCell)
+        let next_cell;
+
+        if (dirLet == "N"){
+            next_cell = player_cell.MovePlayerUp()
+        }
+        if (dirLet == "E"){
+            next_cell = player_cell.MovePlayerRight()
+        }
+        if (dirLet == "S"){
+            next_cell = player_cell.MovePlayerDown()
+        }
+        if (dirLet == "W"){
+            next_cell = player_cell.MovePlayerLeft()
+        }
+        if (!next_cell){
+            return
+        }
+        this.PlayerCell = next_cell.ID
+        
+        drawGrid(1, this.CELL_SIZE, this.CELL_SIZE, "#2a2a3e");
+
+        drawMazeWalls(this, this.CELL_SIZE, "#3f3f5e", 4);
+
+        drawPlayer(this, this.CELL_SIZE, "#c8ff00")
     }
 }
 
@@ -266,71 +342,106 @@ class Cell {
             ["W",this.MoveLeft()]
         ]
     }
-}
 
-function drawMazeWalls(maze, cellSize, wallColor, wallWidth) {
-    ctx.strokeStyle = wallColor;
-    ctx.lineWidth = wallWidth;
-    ctx.lineCap = "round"; // Makes the corners look smoother
+    ValidPathInDir(dir){
+        return (this.Walls[dir] == 0);
+    }
 
-    for (let r = 0; r < maze.grid.length; r++) {
-        for (let c = 0; c < maze.grid[r].length; c++) {
-            const cell = maze.grid[r][c];
-            const x = c * cellSize;
-            const y = r * cellSize;
-
-            // Coordinates for the four corners of the cell
-            const top    = y;
-            const bottom = y + cellSize;
-            const left   = x;
-            const right  = x + cellSize;
-
-            // Draw North Wall
-            if (cell.Walls["N"] === 1) {
-                ctx.beginPath();
-                ctx.moveTo(left, top);
-                ctx.lineTo(right, top);
-                ctx.stroke();
-            }
-            // Draw East Wall
-            if (cell.Walls["E"] === 1) {
-                ctx.beginPath();
-                ctx.moveTo(right, top);
-                ctx.lineTo(right, bottom);
-                ctx.stroke();
-            }
-            // Draw South Wall
-            if (cell.Walls["S"] === 1) {
-                ctx.beginPath();
-                ctx.moveTo(left, bottom);
-                ctx.lineTo(right, bottom);
-                ctx.stroke();
-            }
-            // Draw West Wall
-            if (cell.Walls["W"] === 1) {
-                ctx.beginPath();
-                ctx.moveTo(left, top);
-                ctx.lineTo(left, bottom);
-                ctx.stroke();
-            }
+    MovePlayerUp(){
+        if (!(this.State == this.Parent.PLAYER)){
+            return;
         }
+        if (!this.ValidPathInDir("N")) return
+
+        let next_cell = this.GetCellInDir(dirLetter_to_dirArr("N"));
+        next_cell.State = this.Parent.PLAYER;
+        this.State = this.Parent.PATH
+
+        return next_cell
+    }
+    MovePlayerRight(){
+        if (!(this.State == this.Parent.PLAYER)){
+            return;
+        }
+        if (!this.ValidPathInDir("E")) return
+
+        let next_cell = this.GetCellInDir(dirLetter_to_dirArr("E"));
+        next_cell.State = this.Parent.PLAYER;
+        this.State = this.Parent.PATH
+
+        return next_cell
+    }
+    MovePlayerDown(){
+        if (!(this.State == this.Parent.PLAYER)){
+            return;
+        }
+        if (!this.ValidPathInDir("S")) return
+
+        let next_cell = this.GetCellInDir(dirLetter_to_dirArr("S"));
+        next_cell.State = this.Parent.PLAYER;
+        this.State = this.Parent.PATH
+
+        return next_cell
+    }
+    MovePlayerLeft(){
+        if (!(this.State == this.Parent.PLAYER)){
+            return;
+        }
+        if (!this.ValidPathInDir("W")) return
+
+        let next_cell = this.GetCellInDir(dirLetter_to_dirArr("W"));
+        next_cell.State = this.Parent.PLAYER;
+        this.State = this.Parent.PATH
+    
+        return next_cell
     }
 }
-// 1. Initialize Maze
+
+
+const CANVAS_WIDTH = 500;
+const CANVAS_HEIGHT = 500;
+
+const canvas = document.getElementById('maze-canvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = CANVAS_WIDTH+2;
+canvas.height = CANVAS_HEIGHT+2;
+
 const maze = new Maze();
-const ROWS = 50;
-const COLS = 50;
-const CELL_SIZE = CANVAS_WIDTH / COLS; // Calculates 50px if canvas is 500px
 
-maze.generate_empty_grid(ROWS, COLS);
-maze.generate_maze();
+restartGame(maze)
 
-canvas.width = CANVAS_WIDTH+1;
-canvas.height = CANVAS_HEIGHT+1;
+let arrowKeys = document.querySelectorAll(".arrow-pad button")
 
-// 2. Draw Background Grid (The dark blue lines you already have)
-drawGrid(1, CELL_SIZE, CELL_SIZE, "#2a2a3e");
+for (let arrowKey of arrowKeys){
+    arrowKey.addEventListener("click", ()=>maze.move_player(arrowKey.id))
+}
 
-// 3. Draw the actual Maze Walls (The borders)
-// Using a brighter color like white or cyan to make them pop
-drawMazeWalls(maze, CELL_SIZE, "#3f3f5e", 4);
+document.addEventListener("keydown", e=>{
+    let key = e.key;
+    let mappings = {
+        "ArrowUp": 'N',
+        "ArrowDown": 'S',
+        "ArrowLeft": 'W',
+        "ArrowRight": 'E',
+    
+        "W": "N",
+        "A": "W",
+        "S": "S",
+        "D": "E",
+
+        "w": "N",
+        "a": "W",
+        "s": "S",
+        "d": "E"
+    }
+    maze.move_player(mappings[key])
+
+    let btn = document.getElementById(mappings[key])
+    btn.classList.add("is-active")
+    setTimeout(() =>{
+        btn.classList.remove("is-active")
+    }, 500)
+    
+})
+document.getElementById("new-btn").addEventListener("click", ()=>restartGame(maze))
