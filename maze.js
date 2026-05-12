@@ -1,7 +1,7 @@
 function setBackground(color){
-    ctx.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
+    ctx.clearRect(0,0,CANVAS_WIDTH+10,CANVAS_HEIGHT+10)
     ctx.fillStyle = color
-    ctx.fillRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
+    ctx.fillRect(0,0,CANVAS_WIDTH+10,CANVAS_HEIGHT+10)
 }
 
 function drawGrid(lineWidth, cellWidth, cellHeight, color){
@@ -15,15 +15,15 @@ function drawGrid(lineWidth, cellWidth, cellHeight, color){
 
     for (let x = 0; x<= width; x += cellWidth){
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
+        ctx.moveTo(x+5, 0);
+        ctx.lineTo(x+5, height);
         ctx.stroke();
     }
 
     for (let y = 0; y <= height; y += cellHeight){
         ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
+        ctx.moveTo(0, y+5);
+        ctx.lineTo(width, y+5);
         ctx.stroke();
     }
 }
@@ -61,8 +61,8 @@ function drawMazeWalls(maze, cellSize, wallColour, wallWidth) {
     for (let r = 0; r < maze.grid.length; r++) {
         for (let c = 0; c < maze.grid[r].length; c++) {
             let cell = maze.grid[r][c];
-            let x = c * cellSize;
-            let y = r * cellSize;
+            let x = c * cellSize+5;
+            let y = r * cellSize+5;
 
             let top = y;
             let bottom = y + cellSize;
@@ -95,6 +95,66 @@ function drawMazeWalls(maze, cellSize, wallColour, wallWidth) {
             }
         }
     }
+    //Draws the end and start corners
+    let startr = maze.STARTING_SQUARE_ID["row"]
+    let startc = maze.STARTING_SQUARE_ID["col"]
+    let x = startr * cellSize +5 ;
+    let y = startc * cellSize +5 ;
+
+    let top = y;
+    let bottom = y + cellSize;
+    let left = x;
+    let right = x + cellSize;
+
+    ctx.strokeStyle = "#ce0101";
+    ctx.lineWidth = 2
+    ctx.beginPath();
+    ctx.moveTo(left, top);
+    ctx.lineTo(right, top);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(left,top);
+    ctx.lineTo(left,bottom);
+    ctx.stroke();
+
+    let endr = maze.END_SQUARE_ID["row"]
+    let endc = maze.END_SQUARE_ID["col"]
+    x = endr * cellSize +5 ;
+    y = endc * cellSize +5 ;
+
+    top = y;
+    bottom = y + cellSize;
+    left = x;
+    right = x + cellSize;
+
+    ctx.strokeStyle = "#1deef5";
+    ctx.lineWidth = 2
+    ctx.beginPath();
+    ctx.moveTo(right, top);
+    ctx.lineTo(right, bottom);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(left,bottom);
+    ctx.lineTo(right,bottom);
+    ctx.stroke();
+
+    top += 4
+    bottom -= 5
+    right -= 4
+    left += 4
+
+    ctx.fillStyle = "#338a8de8"
+    ctx.fillRect(left,top,right-left,bottom - top)
+
+   let radius = cellSize/2 - 2
+   let centerY = y+radius +2
+   let centerX = x + radius +2
+
+   ctx.beginPath()
+   ctx.arc(centerX, centerY, radius*0.65, 0, 2 * Math.PI, false);
+   ctx.fillStyle = "#1deef5";
+   ///ctx.fill();
+
 }
 
 function drawPlayer(maze, cellSize, playerColour){
@@ -104,8 +164,8 @@ function drawPlayer(maze, cellSize, playerColour){
    let left = playerCellID["col"]*cellSize
 
    let radius = cellSize/2
-   let centerY = top + radius
-   let centerX = left + radius
+   let centerY = top + radius +5
+   let centerX = left + radius +5
 
    ctx.beginPath()
    ctx.arc(centerX, centerY, radius*0.65, 0, 2 * Math.PI, false);
@@ -135,37 +195,6 @@ function restartGame(maze){
    drawPlayer(maze, CELL_SIZE, "#c8ff00") ;
 }
 
-class Stack {
-    constructor() {
-        this.stack = [];
-        this.stack.length = 0;
-    }
-
-    push(item){
-        this.stack.push(item);
-    }
-
-    peek(){
-        if (this.stack.length == 0){
-            console.error("Stack is empty!");            
-        }
-
-        return this.stack.at(-1);
-    }
-
-    pop(){
-        if (this.stack.length == 0){
-            console.error("Stack is empty!");
-        }
-
-        return this.stack.pop()
-    }
-
-    is_empty(){
-        return (this.stack.length == 0)
-    }
-}
-
 class Maze {
     constructor() {
         this.grid = [];
@@ -177,8 +206,15 @@ class Maze {
         this.PLAYER = "*"
         this.STARTING_SQUARE_ID = {"row": 0, "col": 0}
         this.END_SQUARE_ID = {"row": 9, "col": 9}
-
         this.PlayerCell = this.STARTING_SQUARE_ID
+        this.GameOver = false
+    
+        this.DataCollection = {
+            TotalMoves: 0,
+            StartTime: Math.floor(Date.now()/1000),
+            EndTime: Math.floor(Date.now()/1000),
+            GridSize: '{"row": 5, "col": 5}'
+        }
     }
 
     generate_empty_grid(rows, cols){
@@ -195,8 +231,9 @@ class Maze {
             }
             grid.push(full_row)
         }
-
+        this.END_SQUARE_ID = {"row": rows-1, "col": cols-1}
         this.grid = grid
+        this.DataCollection.GridSize = `{"row": ${rows}, "col": ${cols}}`
     }
 
     generate_maze(){
@@ -205,6 +242,7 @@ class Maze {
                 cell.Visited = false;
             }
         }
+        this.GameOver = false;
 
         let STARTING_CELL = this.get_cell_by_ID(this.STARTING_SQUARE_ID);
         STARTING_CELL.Visited = true;
@@ -259,6 +297,10 @@ class Maze {
     }
 
     move_player(dirLet){
+        if (this.GameOver){
+            return;
+        }
+        this.DataCollection.TotalMoves++
         let player_cell = this.get_cell_by_ID(this.PlayerCell)
         let next_cell;
 
@@ -277,8 +319,18 @@ class Maze {
         if (!next_cell){
             return
         }
+
         this.PlayerCell = next_cell.ID
         
+        if (this.PlayerCell.row==this.END_SQUARE_ID.row & this.PlayerCell.col==this.END_SQUARE_ID.col){
+            //Player has won so uhm do something
+            this.GameOver = true;
+            this.DataCollection.EndTime = Math.floor(Date.now()/1000)
+            console.log("Game won!")
+            console.log(this.DataCollection)
+            saveScore(null, this.DataCollection)
+        }
+
         drawGrid(1, this.CELL_SIZE, this.CELL_SIZE, "#2a2a3e");
 
         drawMazeWalls(this, this.CELL_SIZE, "#3f3f5e", 4);
@@ -397,15 +449,14 @@ class Cell {
     }
 }
 
-
 const CANVAS_WIDTH = 500;
 const CANVAS_HEIGHT = 500;
 
 const canvas = document.getElementById('maze-canvas');
 const ctx = canvas.getContext('2d');
 
-canvas.width = CANVAS_WIDTH+2;
-canvas.height = CANVAS_HEIGHT+2;
+canvas.width = CANVAS_WIDTH+10;
+canvas.height = CANVAS_HEIGHT+10;
 
 const maze = new Maze();
 
@@ -435,13 +486,18 @@ document.addEventListener("keydown", e=>{
         "s": "S",
         "d": "E"
     }
+    let btn = document.getElementById(mappings[key])
+
+    if (!mappings[key]){
+        return
+    }
     maze.move_player(mappings[key])
 
-    let btn = document.getElementById(mappings[key])
     btn.classList.add("is-active")
     setTimeout(() =>{
         btn.classList.remove("is-active")
     }, 500)
     
 })
+
 document.getElementById("new-btn").addEventListener("click", ()=>restartGame(maze))
