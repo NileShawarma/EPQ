@@ -263,7 +263,7 @@ class Maze {
                 }
             });
 
-            if (sanitised_adj_cells.length == 0 or sanitised_adj_cells[0][1] == this.get_cell_by_ID(this.END_SQUARE_ID) ){
+            if (sanitised_adj_cells.length == 0 || sanitised_adj_cells[0][1] == this.get_cell_by_ID(this.END_SQUARE_ID) ){
                 stack.pop()
                 continue
             }
