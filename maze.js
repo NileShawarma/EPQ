@@ -188,11 +188,7 @@ function restartGame(maze){
 
    const CELL_SIZE = CANVAS_WIDTH / COLS; 
 
-   drawGrid(1, CELL_SIZE, CELL_SIZE, "#2a2a3e");
-
-   drawMazeWalls(maze, CELL_SIZE, "#3f3f5e", 4);
-
-   drawPlayer(maze, CELL_SIZE, "#c8ff00") ;
+   maze.heartbeat(maze)
 }
 
 class Maze {
@@ -208,35 +204,49 @@ class Maze {
         this.END_SQUARE_ID = {"row": 9, "col": 9}
         this.PlayerCell = this.STARTING_SQUARE_ID
         this.GameOver = false
-    
+        
+        this.interval_clock = null
+
         this.DataCollection = {
             TotalMoves: 0,
-            StartTime: Math.floor(Date.now()/1000),
+            StartTime: -1,
             EndTime: Math.floor(Date.now()/1000),
-            GridSize: '{"row": 5, "col": 5}'
+            GridSize: 5,
+            GameSeed: "",
+            GenerationType: "recursive_backtracker"
         }
     }
 
-    generate_empty_grid(rows, cols){
+    generate_empty_grid(size){
         let grid = [];
-        this.CELL_SIZE = CANVAS_WIDTH / cols; 
-
-        for (let row = 0; row < rows; row ++){
+        this.CELL_SIZE = CANVAS_WIDTH / size; 
+        this.DataCollection = {
+            TotalMoves: 0,
+            StartTime: -1,
+            EndTime: Math.floor(Date.now()/1000),
+            GridSize: 5,
+            GameSeed: "",
+            GenerationType: "recursive_backtracker"
+        }
+        clearInterval(this.interval_clock)
+        for (let row = 0; row < size; row ++){
             let full_row = [];
 
-            for (let col =0; col < cols; col++){
+            for (let col =0; col < size; col++){
                 full_row.push(
                     new Cell(this, {"row": row, "col": col})
                 )
             }
             grid.push(full_row)
         }
-        this.END_SQUARE_ID = {"row": rows-1, "col": cols-1}
+        this.END_SQUARE_ID = {"row": size-1, "col": size-1}
         this.grid = grid
-        this.DataCollection.GridSize = `{"row": ${rows}, "col": ${cols}}`
+        this.DataCollection.GridSize = size
+        document.getElementById("msg").textContent = ""
+        document.getElementById("msg").classList.remove("won")
     }
 
-    generate_maze(){
+    load_maze_seed(size, seed_string){
         for (const row of this.grid){
             for (const cell of row){
                 cell.Visited = false;
@@ -244,9 +254,31 @@ class Maze {
         }
         this.GameOver = false;
 
-        let STARTING_CELL = this.get_cell_by_ID(this.STARTING_SQUARE_ID);
-        STARTING_CELL.Visited = true;
+        this.generate_empty_grid(size)
+
+        let STARTING_CELL = this.get_cell_by_ID(this.STARTING_SQUARE_ID)
+
+        let stack = new Stack()
+        stack.push(STARTING_CELL)
+
+        for (let char of seed_string){
+            let current_cell = stack.peek()
+
+            if (char!="<"){
+                current_cell.BreakWallInDir(dirLetter_to_dirArr(char))
+                stack.push(current_cell.GetCellInDir(dirLetter_to_dirArr(char)))
+            }else{
+                stack.pop()
+            }
+        }
+
+        this.DataCollection.GridSize = size
+        this.DataCollection.GameSeed = seed_string
         this.PlayerCell = this.STARTING_SQUARE_ID
+        this.grid[0][0].State = this.PLAYER
+    }
+    generate_recursive_backtracker(){
+        let STARTING_CELL = this.get_cell_by_ID(this.STARTING_SQUARE_ID);
 
         let stack = new Stack();
         stack.push(STARTING_CELL);
@@ -263,8 +295,9 @@ class Maze {
                 }
             });
 
-            if (sanitised_adj_cells.length == 0 || current_cell == this.get_cell_by_ID(this.END_SQUARE_ID) ){
+            if (sanitised_adj_cells.length == 0 || current_cell == this.get_cell_by_ID(this.END_SQUARE_ID)){
                 stack.pop()
+                this.DataCollection.GameSeed = this.DataCollection.GameSeed + "<"
                 continue
             }
 
@@ -274,6 +307,8 @@ class Maze {
                         
             let cell_to_go_to_dir = cell_to_go_to_details[0]
             let cell_to_go_to = cell_to_go_to_details[1]
+            
+            this.DataCollection.GameSeed = this.DataCollection.GameSeed + cell_to_go_to_dir
 
             current_cell.BreakWallInDir(dirLetter_to_dirArr(cell_to_go_to_dir))
 
@@ -281,6 +316,21 @@ class Maze {
 
             cell_to_go_to.Visited = true
         }
+
+    }
+    generate_maze(){
+        for (const row of this.grid){
+            for (const cell of row){
+                cell.Visited = false;
+            }
+        }
+        this.GameOver = false;
+
+        let STARTING_CELL = this.get_cell_by_ID(this.STARTING_SQUARE_ID);
+        STARTING_CELL.Visited = true;
+        this.PlayerCell = this.STARTING_SQUARE_ID
+
+        this.generate_recursive_backtracker()
 
         this.grid[0][0].State = this.PLAYER
     }
@@ -300,7 +350,7 @@ class Maze {
         if (this.GameOver){
             return;
         }
-        this.DataCollection.TotalMoves++
+        this.heartbeat(this)        
         let player_cell = this.get_cell_by_ID(this.PlayerCell)
         let next_cell;
 
@@ -317,7 +367,18 @@ class Maze {
             next_cell = player_cell.MovePlayerLeft()
         }
         if (!next_cell){
-            return
+            if (this.DataCollection.StartTime!=-1){
+                this.DataCollection.TotalMoves++
+            }
+            return;
+        }else{
+            this.DataCollection.TotalMoves++
+        }
+        if (this.DataCollection.StartTime==-1){
+            this.DataCollection.StartTime = Math.floor(Date.now()/1000)
+            this.interval_clock = setInterval(() => {
+                this.heartbeat(this)
+            }, 1000);
         }
 
         this.PlayerCell = next_cell.ID
@@ -328,8 +389,36 @@ class Maze {
             this.DataCollection.EndTime = Math.floor(Date.now()/1000)
             console.log("Game won!")
             console.log(this.DataCollection)
-            saveScore(null, this.DataCollection)
+            this.game_won()
+
         }
+        this.heartbeat(this)    
+    }
+
+    game_won(){
+        let time_taken = this.DataCollection.EndTime-this.DataCollection.StartTime
+        let msg_line = document.getElementById("msg");
+        msg_line.textContent = `//MAZE ESCAPED IN ${time_taken}s`
+
+        msg_line.classList.add('won')
+        saveScore(null, this.DataCollection)
+        clearInterval(this.interval_clock)
+    }
+    //idk the convention but ive seen hearbeat used as a
+    //function name, so here its js used to render the screen
+    heartbeat(maze){
+        if (!maze.GameOver){ //Only modify displayed time IF the game is still in progress
+            let startTime = maze.DataCollection.StartTime;
+            if (startTime == -1){ // -1 indicates the game hasnt started yet
+                startTime = Math.floor(Date.now()/1000)
+            }
+            document.getElementById("timer").textContent = Math.floor(Date.now()/1000) - startTime + "s"
+        }
+        
+        let size = maze.DataCollection.GridSize
+        document.getElementById("size-disp").textContent = `${size}x${size}`
+
+        document.getElementById("steps").textContent = maze.DataCollection.TotalMoves
 
         drawGrid(1, this.CELL_SIZE, this.CELL_SIZE, "#2a2a3e");
 
@@ -382,7 +471,6 @@ class Cell {
 
     GetCellInDir(dir){
         let NewID = {"row": this.ID["row"]+dir[0], "col": this.ID["col"]+dir[1]}
-
         return this.Parent.get_cell_by_ID(NewID)
     }
 

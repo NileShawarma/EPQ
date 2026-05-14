@@ -8,17 +8,24 @@ async function saveScore(
             TotalMoves: 0,
             StartTime: Math.floor(Date.now()/1000),
             EndTime: Math.floor(Date.now()/1000),
-            GridSize: '{"row": 5, "col": 5}'
+            GridSize: 5,
+            GameSeed: "",
+            GenerationType: "recursive_backtracker"
         }
     )
 {
+    if (DataCollectionArgs.GameSeed==""){
+        throw new Error("Cannot save game without proper seed!");
+    }
     const {data, error} = await my_supabase
         .from("leaderboard")
         .insert([{
             username: username,
             time_taken: DataCollectionArgs.EndTime-DataCollectionArgs.StartTime,
             moves: DataCollectionArgs.TotalMoves,
-            grid_size: JSON.parse(DataCollectionArgs.GridSize)
+            grid_size: DataCollectionArgs.GridSize,
+            game_seed: DataCollectionArgs.game_seed,
+            generation_type: DataCollectionArgs.GenerationType
         }])
     if (error) console.error("Error saving:", error);
         else console.log("Score saved!");
