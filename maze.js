@@ -190,7 +190,45 @@ function restartGame(maze){
 
    maze.heartbeat(maze)
 }
+function showUsernameWarning(){
+    let warningText = document.getElementById("warning");
+    warningText.textContent = "Please Enter a username before playing"
 
+    setTimeout(()=>{
+        warningText.textContent = ""
+    },4000)
+}
+function validUsername(){
+    let input = document.getElementById("username");
+    let usernameTitle = document.getElementsByClassName("username")[0]
+    let contents = input.value;
+    try {
+        let validName = true;
+        let year = contents.substring(0,2);
+        let initials = contents.substring(2);
+        
+        year = Number(year);
+
+        if (isNaN(year)){
+            validName = false;
+            console.log(year)
+        }else if (contents.length<=4){
+            validName = false;
+            console.log(contents)
+        }
+
+        if (!validName){
+            throw new Error("Invalid name")
+        }
+        input.classList.add('confirmed')
+        usernameTitle.classList.add('confirmed')
+        input.disabled = true;
+        return true;
+    } catch (error) {
+        showUsernameWarning();
+        return false;
+    }
+}
 class Maze {
     constructor() {
         this.grid = [];
@@ -204,7 +242,8 @@ class Maze {
         this.END_SQUARE_ID = {"row": 9, "col": 9}
         this.PlayerCell = this.STARTING_SQUARE_ID
         this.GameOver = false
-        
+        this.GameStarted = false
+
         this.interval_clock = null
 
         this.DataCollection = {
@@ -246,7 +285,7 @@ class Maze {
         document.getElementById("msg").classList.remove("won")
     }
 
-    load_maze_seed(size, seed_string){
+    load_maze_seed(size, seed_string, mode = "recursive_backtracker"){
         for (const row of this.grid){
             for (const cell of row){
                 cell.Visited = false;
@@ -325,6 +364,7 @@ class Maze {
             }
         }
         this.GameOver = false;
+        this.GameStarted = false;
 
         let STARTING_CELL = this.get_cell_by_ID(this.STARTING_SQUARE_ID);
         STARTING_CELL.Visited = true;
@@ -347,8 +387,14 @@ class Maze {
     }
 
     move_player(dirLet){
-        if (this.GameOver){
+        if (this.GameOver){ //If game is over, dont try and do anything
             return;
+        }
+
+        if (this.GameStarted==false){ //If we just started, check if the user is valid before doing anything
+            if (validUsername()==false){
+                return;
+            }
         }
         this.heartbeat(this)        
         let player_cell = this.get_cell_by_ID(this.PlayerCell)
@@ -367,14 +413,16 @@ class Maze {
             next_cell = player_cell.MovePlayerLeft()
         }
         if (!next_cell){
-            if (this.DataCollection.StartTime!=-1){
+            if (this.GameStarted==true){
                 this.DataCollection.TotalMoves++
             }
             return;
         }else{
             this.DataCollection.TotalMoves++
         }
-        if (this.DataCollection.StartTime==-1){
+        if (this.GameStarted==false){
+
+            this.GameStarted = true
             this.DataCollection.StartTime = Math.floor(Date.now()/1000)
             this.interval_clock = setInterval(() => {
                 this.heartbeat(this)
@@ -401,7 +449,7 @@ class Maze {
         msg_line.textContent = `//MAZE ESCAPED IN ${time_taken}s`
 
         msg_line.classList.add('won')
-        saveScore(null, this.DataCollection)
+        saveScore(document.getElementById("username").value, this.DataCollection)
         clearInterval(this.interval_clock)
     }
     //idk the convention but ive seen hearbeat used as a
@@ -578,6 +626,9 @@ document.addEventListener("keydown", e=>{
 
     if (!mappings[key]){
         return
+    }
+    if (e.target.tagName == "INPUT"){
+        return;
     }
     maze.move_player(mappings[key])
 

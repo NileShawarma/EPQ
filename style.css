@@ -24,6 +24,31 @@ body{
 header{
     text-align: center;
 }
+.username{
+    display: inline-block;
+    transition: all 0.5s;
+}
+.username-input{
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    transition: all 0.5s;
+}
+.username.confirmed{
+    color: var(--muted)
+}
+.username-input.confirmed{
+    border: 1px solid var(--muted);
+    color: var(--muted)
+}
+.warning{
+    color :red;
+    font-family: 'Space Mono', monospace;
+    font-size: 1.25rem;
+}
 
 .logo span{
     display: inline-block;

@@ -24,7 +24,7 @@ async function saveScore(
             time_taken: DataCollectionArgs.EndTime-DataCollectionArgs.StartTime,
             moves: DataCollectionArgs.TotalMoves,
             grid_size: DataCollectionArgs.GridSize,
-            game_seed: DataCollectionArgs.game_seed,
+            game_seed: DataCollectionArgs.GameSeed,
             generation_type: DataCollectionArgs.GenerationType
         }])
     if (error) console.error("Error saving:", error);
