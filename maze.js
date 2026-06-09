@@ -189,10 +189,11 @@ function restartGame(maze){
    const CELL_SIZE = CANVAS_WIDTH / COLS; 
 
    maze.heartbeat(maze)
+   unlock_username_input()
 }
 function showUsernameWarning(){
     let warningText = document.getElementById("warning");
-    warningText.textContent = "Please Enter a username before playing"
+    warningText.textContent = "Please Enter A Valid Username Before Playing"
 
     setTimeout(()=>{
         warningText.textContent = ""
@@ -211,23 +212,36 @@ function validUsername(){
 
         if (isNaN(year)){
             validName = false;
-            console.log(year)
-        }else if (contents.length<=4){
+        }else if (contents.length<=4 || contents.length> 8){
             validName = false;
-            console.log(contents)
         }
 
         if (!validName){
             throw new Error("Invalid name")
         }
-        input.classList.add('confirmed')
-        usernameTitle.classList.add('confirmed')
-        input.disabled = true;
-        return true;
+        return lock_username_input()
     } catch (error) {
         showUsernameWarning();
         return false;
     }
+}
+function lock_username_input(){
+    let input = document.getElementById("username");
+    let usernameTitle = document.getElementsByClassName("username")[0]
+    
+    input.classList.add('confirmed')
+    usernameTitle.classList.add('confirmed')
+    input.disabled = true;
+    return true;
+}
+function unlock_username_input(){
+    let input = document.getElementById("username");
+    let usernameTitle = document.getElementsByClassName("username")[0]
+    
+    input.classList.remove('confirmed')
+    usernameTitle.classList.remove('confirmed')
+    input.disabled = false;
+    return true;
 }
 class Maze {
     constructor() {
@@ -246,6 +260,7 @@ class Maze {
 
         this.interval_clock = null
 
+        this.GenerationMode = "recursive_backtracker"
         this.DataCollection = {
             TotalMoves: 0,
             StartTime: -1,
@@ -317,6 +332,8 @@ class Maze {
         this.grid[0][0].State = this.PLAYER
     }
     generate_recursive_backtracker(){
+        this.DataCollection.GenerationType = "recursive_backtracker"
+
         let STARTING_CELL = this.get_cell_by_ID(this.STARTING_SQUARE_ID);
 
         let stack = new Stack();
@@ -357,6 +374,70 @@ class Maze {
         }
 
     }
+    generate_wilsons(){
+        let STARTING_CELL = this.get_cell_by_ID(this.STARTING_SQUARE_ID);
+        STARTING_CELL.Visited = true;
+
+        let non_maze_cells = this.grid.flat();
+        let remove_from_non_maze = (cell) => {
+            let index = non_maze_cells.indexOf(cell);
+            if (index != -1){
+                non_maze_cells.splice(index, 1);
+            }
+        };
+        let get_random_cell = () => {
+            return non_maze_cells[Math.floor(
+                Math.random() * non_maze_cells.length
+            )];
+        };
+
+        remove_from_non_maze(STARTING_CELL);
+        this.DataCollection.GenerationType = "wilsons";
+
+        while (non_maze_cells.length != 0){
+            let random_starting_cell = get_random_cell();
+            let current_cell = random_starting_cell;
+            let path = [current_cell];
+            let path_dirs = [];
+
+            while (current_cell.Visited != true){
+                let sanitised_adj_cells = current_cell.GetAdjacentCells().filter((cell) => {
+                    return cell[1] != -1;
+                });
+
+                let cell_to_go_to_details = sanitised_adj_cells[Math.floor(
+                    Math.random() * sanitised_adj_cells.length
+                )];
+
+                let cell_to_go_to_dir = cell_to_go_to_details[0];
+                let cell_to_go_to = cell_to_go_to_details[1];
+                let loop_start_index = path.indexOf(cell_to_go_to);
+
+                if (loop_start_index != -1){
+                    path = path.slice(0, loop_start_index + 1);
+                    path_dirs = path_dirs.slice(0, loop_start_index);
+                }else{
+                    path.push(cell_to_go_to);
+                    path_dirs.push(cell_to_go_to_dir);
+                }
+
+                current_cell = cell_to_go_to;
+            }
+
+            current_cell = random_starting_cell;
+            current_cell.Visited = true;
+            remove_from_non_maze(current_cell);
+
+            for (let dir of path_dirs){
+                current_cell.BreakWallInDir(dirLetter_to_dirArr(dir));
+                current_cell = current_cell.GetCellInDir(dirLetter_to_dirArr(dir));
+                current_cell.Visited = true;
+                remove_from_non_maze(current_cell);
+            }
+
+            this.DataCollection.GameSeed = this.DataCollection.GameSeed + path_dirs.join("") + "<";
+        }
+    }
     generate_maze(){
         for (const row of this.grid){
             for (const cell of row){
@@ -369,8 +450,17 @@ class Maze {
         let STARTING_CELL = this.get_cell_by_ID(this.STARTING_SQUARE_ID);
         STARTING_CELL.Visited = true;
         this.PlayerCell = this.STARTING_SQUARE_ID
-
-        this.generate_recursive_backtracker()
+        
+        switch (this.GenerationMode) {
+            case "recursive_backtracker":
+                this.generate_recursive_backtracker();
+                break;
+            case "wilsons":
+                this.generate_wilsons();
+                break;
+            default:
+                this.generate_recursive_backtracker();
+        }
 
         this.grid[0][0].State = this.PLAYER
     }

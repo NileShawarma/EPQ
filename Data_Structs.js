@@ -27,4 +27,8 @@ class Stack {
     is_empty(){
         return (this.stack.length == 0)
     }
+
+    reverse(){
+        this.stack.reverse()
+    }
 }

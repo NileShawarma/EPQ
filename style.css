@@ -86,6 +86,9 @@ header{
 .tagline span{
     animation: white_flashing_or_pulsing_text_thing 5s ease 1s infinite normal both;
 }
+footer span{
+    animation: white_flashing_or_pulsing_text_thing 5s ease 1s infinite normal both;
+}
 @keyframes white_flashing_or_pulsing_text_thing {
     0%,100% {color: var(--muted);}
     75% {color: white;}
