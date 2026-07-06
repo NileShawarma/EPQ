@@ -1,0 +1,307 @@
+:root {
+    --bg: #fff1e6;
+    --surface: #ffe0cc;
+    --border: #5c4a42;
+    --accent: #ff9f7a;
+    --accent2: #7fd8c4;
+    --text: #4a3b35;
+    --muted: #a68f85;
+    --wall: #a8765f;
+    --player: #ffb88c;
+    --exit: #7fd8c4;
+    --trail: rgba(255,159,122,0.12);
+}
+
+body{
+    background: var(--bg);
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+header{
+    text-align: center;
+}
+
+.overlay{
+    position: fixed;
+    top: 0;
+    right: 0;
+    left : 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+}
+.overlay.active{
+    display: flex;
+}
+.popup{
+    background: var(--wall);
+    border-color: var(--accent2);
+    color: var(--text);
+    padding:24px;
+    width: 300px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    position: relative;
+    isolation: isolate;
+    transform: translateY(-100px);
+}
+.popup::before{
+    content:"";
+    inset: -2px;
+    position: absolute;
+    border-radius: 18px;
+    background: conic-gradient(
+        from var(--angle),
+        transparent 0%,
+        var(--accent2) 10%,
+        transparent 25%
+    );
+    z-index: -1;
+    animation: spin 2.5s linear infinite;
+}
+.popup::after{
+    position:absolute;
+    content: "";
+    inset: 2px;
+    border-radius: 14px;
+    background: var(--wall);
+    z-index: -1;
+}
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+ 
+@keyframes spin {
+    to { --angle: 360deg; }
+}
+.username{
+    display: inline-block;
+    transition: all 0.5s;
+}
+.username-input{
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    transition: all 0.5s;
+}
+.username.confirmed{
+    color: var(--muted)
+}
+.username-input.confirmed{
+    border: 1px solid var(--muted);
+    color: var(--muted)
+}
+.warning{
+    color :red;
+    font-family: 'Space Mono', monospace;
+    font-size: 1.25rem;
+}
+
+.logo span{
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 2.5rem;
+    font-weight: 700;
+    animation: text_shake 10s ease 1s 3 normal both;
+}
+
+.tagline{
+    font-size: 0.75rem;
+    padding-top: 0.1rem;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+.tagline span{
+    animation: text_shake 10s ease 1s 3 normal both;
+}
+@keyframes text_shake {
+    10%,30%,50%,70%,90% {
+        transform: translateY(10px)
+    }
+    20%,40%,60%,80% {
+        transform: translateY(-10px)
+    }
+}
+
+.logo span:nth-child(1) {animation-delay: 0s;}
+.logo span:nth-child(2) {animation-delay: 0.125s;}
+.logo span:nth-child(3) {animation-delay: 0.250s;}
+.logo span:nth-child(4) {animation-delay: 0.375s;}
+.logo span:nth-child(5) {animation-delay: 0.5s;}
+.logo span:nth-child(6) {animation-delay: 0.625s;}
+.logo span:nth-child(7) {animation-delay: 0.75s;}
+.logo span:nth-child(8) {animation-delay: 0s.875;}
+
+footer span{
+    animation: white_flashing_or_pulsing_text_thing 5s ease 1s infinite normal both;
+}
+@keyframes white_flashing_or_pulsing_text_thing {
+    0%,100% {color: var(--muted);}
+    75% {color: white;}
+}
+
+.hud {
+    display: flex;
+    justify-self: center;
+    gap: 20px;
+}
+
+#maze-canvas{
+    background: white;
+    max-width: 100%;
+    height: auto;
+    cursor: pointer;
+}
+.controls{
+    display: flex;
+    justify-content: center;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    gap: 50px;
+}
+select{
+    width:190px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 0px;
+    font-family: 'Space Mono', monospace;
+    transition: border-color 0.45s, color 0.45s, background 0.45s, transform 0.15s;
+}
+option{
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+}
+select:hover{
+    background: var(--accent);
+    color: var(--surface);
+    border-color: var(--surface);
+}
+select:active{
+    background: var(--accent2);
+    transform: scale(90%);
+}
+.btn.primary{
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 5px;
+    transition: border-color 0.45s, color 0.45s, background 0.45s, transform 0.15s;
+}
+.btn.primary:hover{
+    background: var(--accent);
+    color: var(--surface);
+    border-color: var(--surface);
+}
+.btn.btn.primary:active{
+    background: var(--accent2);
+    transform: scale(90%);
+}
+
+.arrow-pad{
+    display: grid;
+    grid-template-columns: repeat(3,40px);
+    grid-template-rows: repeat(2,40px);
+    gap: 5px;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+}
+
+.arrow-pad button{
+    width: 40px;
+    height: 40px;
+    display: flex;align-items: center;justify-content: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 16px;
+    font-family: 'Space Mono', monospace;
+    transition: border-color 0.45s, color 0.45s, background 0.15s, transform 0.15s;
+}
+
+.arrow-pad #N{
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.arrow-pad button{
+    font-size: 0;
+}
+
+.arrow-pad button::before{
+    font-size: 16px;
+}
+
+.arrow-pad #W::before{
+    content: "\2190";
+}
+
+.arrow-pad #S::before{
+    content: "\2193";
+}
+
+.arrow-pad #E::before{
+    content: "\2192";
+}
+
+.arrow-pad button:hover{
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.arrow-pad button:active,
+.arrow-pad button.is-active{
+    transform: scale(90%);
+    border-color: var(--accent2);
+    color: var(--accent2);
+}
+
+.hud-label {
+    font-size: 0.8rem;
+    padding-top: 0.1rem;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+.hud-val {
+    padding-top: 1rem;
+    color: var(--text);
+}
+.hud-val.accent{
+    color: var(--accent);
+}
+.msg-line{
+    font-size: 1rem;
+    color: var(--exit);
+    text-align: center;
+}
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+.msg-line.won{
+    animation: blink 0.6s step-end 3;
+}
+footer{
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+}

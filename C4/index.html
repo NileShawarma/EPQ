@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONNECT 4</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <script type="text/javascript" src="C4_AI.js?v=2" defer></script>
+  <script type="text/javascript" src="C4.js?v=2" defer></script>
+  <script type="text/javascript" src="../API_Module.js" defer></script>
+</head>
+<body>
+<div class="overlay" id="overlay">
+  <div class="popup" id="popup">
+    Hello there
+  </div>
+</div>
+<div class="shell">
+
+  <header>
+    <div class="logo">
+      <span>C</span>
+      <span>O</span>
+      <span>N</span>
+      <span>N</span>
+      <span>E</span>
+      <span>C</span>
+      <span>T</span>
+
+      <span>4</span>
+    </div>
+    <div class="tagline">Drop a piece, get 4 in a row to <span>win!</span></div>
+    <p class="username">USERNAME:</p><input class="username-input" id="username" placeholder="e.g. 21mirzoz">
+    <div class="warning" id="warning">
+    </div>
+    <div class="tagline">// Note, the username should be your school username</div>
+  </header>
+
+  <div class="hud">
+    <div class="hud-item">
+      <div class="hud-val accent" id="timer">0s</div>
+      <div class="hud-label">Time</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-val" id="steps">0</div>
+      <div class="hud-label">Moves</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-val" id="size-disp">7x6</div>
+      <div class="hud-label">Board</div>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="maze-canvas"></canvas>
+  </div>
+
+  <div class="msg-line" id="msg"></div>
+
+  <div class="controls">
+    <select id="size-sel">
+      <option value="easy">Easy</option>
+      <option value="medium" selected>Medium</option>
+      <option value="hard">Hard</option>
+      <option value="master">Master</option>
+    </select>
+    <button class="btn primary" id="new-btn">[ NEW GAME ]</button>
+  </div>
+
+  <div class="arrow-pad">
+    <div></div>
+    <div></div>
+    <div></div>
+    <button id="W">&larr;</button>
+    <button id="S">&darr;</button>
+    <button id="E">&rarr;</button>
+  </div>
+
+  <footer>Use A/D or arrow keys to choose a column . Enter, S, down, or click to <span>drop</span></footer>
+
+</div>
