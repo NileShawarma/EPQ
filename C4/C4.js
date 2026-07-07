@@ -201,15 +201,21 @@ class Connect4 {
         this.interval_clock = null
         this.pending_ai_turn = null
 
+        this.LastMoveTime = -1
+
         this.DataCollection = {
-            TotalMoves: 0,
+            Username: "",
+            Difficulty: "medium",
             StartTime: -1,
-            EndTime: Math.floor(Date.now() / 1000),
-            GridSize: "7x6",
-            GameSeed: "",
-            GenerationType: "connect4-medium",
-            PlayerMovement: "",
-            Winner: ""
+            EndTime: -1,
+            Winner: 0,
+            TotalMoves: 0,
+            PlayerMoves: [],
+            MoveTimings: [],
+            FinalBoard: [],
+            OptimalMoves: [],
+            MoveAgreementRate: 0,
+            CriticalMistakes: []
         }
     }
 
@@ -236,15 +242,20 @@ class Connect4 {
         this.WaitingForAI = false
         this.GameOver = false
         this.WinningCells = []
+        this.LastMoveTime = -1
         this.DataCollection = {
-            TotalMoves: 0,
+            Username: "",
+            Difficulty: document.getElementById("size-sel").value,
             StartTime: -1,
-            EndTime: Math.floor(Date.now() / 1000),
-            GridSize: "7x6",
-            GameSeed: "",
-            GenerationType: `connect4-${this.Difficulty}`,
-            PlayerMovement: "",
-            Winner: ""
+            EndTime: -1,
+            Winner: 0,
+            TotalMoves: 0,
+            PlayerMoves: [],
+            MoveTimings: [],
+            FinalBoard: [],
+            OptimalMoves: [],
+            MoveAgreementRate: 0,
+            CriticalMistakes: []
         }
 
         let msg_line = document.getElementById("msg")
@@ -360,9 +371,11 @@ class Connect4 {
             if (cell.State == this.EMPTY){
                 cell.State = piece
                 this.DataCollection.TotalMoves++
-                this.DataCollection.GameSeed += `${piece}${col}`
                 if (piece == this.PLAYER){
-                    this.DataCollection.PlayerMovement += col
+                    let now = Date.now()
+                    this.DataCollection.PlayerMoves.push(col)
+                    this.DataCollection.MoveTimings.push(Math.floor(now - this.LastMoveTime))
+                    this.LastMoveTime = now
                 }
                 return true
             }
@@ -379,6 +392,9 @@ class Connect4 {
             this.GameOver = true
             this.DataCollection.EndTime = Math.floor(Date.now() / 1000)
             this.DataCollection.Winner = piece == this.PLAYER ? "player" : "ai"
+            this.DataCollection.FinalBoard = this.get_board_state()
+            this.DataCollection.Username = document.getElementById("username").value
+            this.save_game_data()
             this.game_over(piece)
             return true
         }
@@ -387,11 +403,25 @@ class Connect4 {
             this.GameOver = true
             this.DataCollection.EndTime = Math.floor(Date.now() / 1000)
             this.DataCollection.Winner = "draw"
+            this.DataCollection.FinalBoard = this.get_board_state()
+            this.DataCollection.Username = document.getElementById("username").value
+            this.save_game_data()
             this.game_drawn()
             return true
         }
 
         return false
+    }
+
+    save_game_data(){
+        let ai = new Connect4AI()
+        let analysis = ai.replay_human_game(this.DataCollection.PlayerMoves, this.DataCollection.Difficulty)
+
+        this.DataCollection.OptimalMoves = analysis.OptimalMoves
+        this.DataCollection.MoveAgreementRate = analysis.MoveAgreementRate
+        this.DataCollection.CriticalMistakes = analysis.CriticalMistakes
+
+        saveConnect4Score(this.DataCollection.Username, this.DataCollection)
     }
 
     game_over(piece){
@@ -420,6 +450,7 @@ class Connect4 {
 
     start_game_clock(){
         this.DataCollection.StartTime = Math.floor(Date.now() / 1000)
+        this.LastMoveTime = Date.now()
         this.interval_clock = setInterval(() => {
             this.heartbeat(this)
         }, 1000)

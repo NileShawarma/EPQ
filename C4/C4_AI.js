@@ -325,4 +325,57 @@ class Connect4AI {
     copy_board(board) {
         return board.map(row => row.slice());
     }
+
+    replay_human_game(playerMoves, difficulty) {
+        let board = [];
+        let humanPiece = "R";
+        let aiPiece = "Y";
+        let agreements = 0;
+
+        let analysis = {
+            OptimalMoves: [],
+            MoveAgreementRate: 0,
+            CriticalMistakes: []
+        };
+
+        for (let row = 0; row < this.ROWS; row++) {
+            board.push(new Array(this.COLS).fill(this.EMPTY));
+        }
+
+        for (let i = 0; i < playerMoves.length; i++) {
+            let human_col = playerMoves[i];
+            let optimal_col = this.choose_move(board, humanPiece, aiPiece, difficulty);
+
+            analysis.OptimalMoves.push(optimal_col);
+
+            if (optimal_col == human_col) {
+                agreements++;
+            }
+
+            if (this.move_is_critical(board, optimal_col, humanPiece, aiPiece) &&
+                !this.move_is_critical(board, human_col, humanPiece, aiPiece)) {
+                analysis.CriticalMistakes.push(i);
+            }
+
+            this.drop_piece(board, human_col, humanPiece);
+        }
+
+        if (playerMoves.length > 0) {
+            analysis.MoveAgreementRate = Math.round((agreements / playerMoves.length) * 100);
+        }
+
+        return analysis;
+    }
+
+    move_is_critical(board, col, humanPiece, aiPiece) {
+        let win_board = this.copy_board(board);
+        this.drop_piece(win_board, col, humanPiece);
+        if (this.has_winner(win_board, humanPiece)) {
+            return true;
+        }
+
+        let block_board = this.copy_board(board);
+        this.drop_piece(block_board, col, aiPiece);
+        return this.has_winner(block_board, aiPiece);
+    }
 }
