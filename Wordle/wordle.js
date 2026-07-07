@@ -1,4 +1,4 @@
-const supabaseURL = "https://lnmficqjmkhukjqugnxl.supabase.co/rest/v1/maze_event"
+const supabaseURL = "https://lnmficqjmkhukjqugnxl.supabase.co/rest/v1/wordle_leaderboard"
 
 const WORD_BANK = {
     "4": [

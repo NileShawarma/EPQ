@@ -1,4 +1,4 @@
-﻿const supabaseURL = "https://lnmficqjmkhukjqugnxl.supabase.co/rest/v1/maze_event"
+﻿const supabaseURL = "https://lnmficqjmkhukjqugnxl.supabase.co/rest/v1/connect4_leaderboard"
 
 function setBackground(color){
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
