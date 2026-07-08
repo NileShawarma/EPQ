@@ -1,5 +1,3 @@
-const supabaseURL = "https://lnmficqjmkhukjqugnxl.supabase.co/rest/v1/wordle_leaderboard"
-
 const WORD_BANK = {
     "4": [
         "ABLE", "BIRD", "CALM", "COLD", "DARK", "DUST", "ECHO", "FISH", "FLAG", "GLOW",

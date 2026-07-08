@@ -1,5 +1,3 @@
-const supabaseURL = "https://lnmficqjmkhukjqugnxl.supabase.co/rest/v1/maze_event"
-
 const IS_CSCLUB_EVENT_RUNNING = true
 let event_details = {
     "levels": [

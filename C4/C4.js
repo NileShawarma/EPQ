@@ -1,6 +1,4 @@
-﻿const supabaseURL = "https://lnmficqjmkhukjqugnxl.supabase.co/rest/v1/connect4_leaderboard"
-
-function setBackground(color){
+﻿function setBackground(color){
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
     ctx.fillStyle = color
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
