@@ -876,4 +876,6 @@ document.getElementById("overlay").addEventListener("click", (e)=>{
 
 if (IS_CSCLUB_EVENT_RUNNING==true){
     skillsTest()
+}else{
+    popup_text("welcome to the maze! use WASD or the arrow keys to move your character and find the cyan exit marker. pick a grid size, enter your username, and try to escape in as few steps as possible. click anywhere outside this box to begin!")
 }

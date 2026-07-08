@@ -1,15 +1,16 @@
+/* Lo-Fi palette: warm charcoal, cream, dusty peach, faded amber & sage */
 :root {
-    --bg: #1c1430;
-    --surface: #2a1f45;
-    --border: #453567;
-    --accent: #b388ff;
-    --accent2: #ffd166;
-    --text: #ece5f6;
-    --muted: #8b7aa8;
-    --wall: #352859;
-    --player: #b388ff;
-    --exit: #ffd166;
-    --trail: rgba(179,136,255,0.12);
+    --bg: #2b2823;
+    --surface: #37322a;
+    --border: #4d463b;
+    --accent: #ddbea9;
+    --accent2: #d4a373;
+    --text: #f1e9dd;
+    --muted: #96897a;
+    --wall: #443d33;
+    --player: #ddbea9;
+    --exit: #d4a373;
+    --trail: rgba(221,190,169,0.12);
 }
 
 body{
@@ -23,6 +24,28 @@ body{
 
 header{
     text-align: center;
+}
+
+.home-link{
+    display: block;
+    width: fit-content;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-decoration: none;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 6px 12px;
+    margin-bottom: 10px;
+    transition: border-color 0.3s, color 0.3s, transform 0.15s;
+}
+.home-link:hover{
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.home-link:active{
+    transform: scale(0.94);
 }
 
 .overlay{

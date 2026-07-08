@@ -2,6 +2,16 @@ const supabaseURL = "https://lnmficqjmkhukjqugnxl.supabase.co"
 const supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxubWZpY3FqbWtodWtqcXVnbnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MjAzNDgsImV4cCI6MjA5MjE5NjM0OH0.C_B-ZuZwnBHoL6LVJ90yZa74Vy0R42o4qz9wKBbFZGk"
 const my_supabase = supabase.createClient(supabaseURL, supabase_key)
 
+//Pulls the ADHD/autism flags saved on the landing page settings (Profile.js);
+//defaults to false if Profile.js isn't loaded or nothing has been saved yet
+function getNeurodivergenceFlags(){
+    if (typeof getPlayerProfile == "function"){
+        let profile = getPlayerProfile()
+        return {has_adhd: profile.adhd, has_autism: profile.autism}
+    }
+    return {has_adhd: false, has_autism: false}
+}
+
 async function saveScore(
     username = "Developer", 
     DataCollectionArgs = {
@@ -31,7 +41,8 @@ async function saveScore(
             generation_type: DataCollectionArgs.GenerationType,
             player_movement: DataCollectionArgs.PlayerMovement,
             optimal_path: DataCollectionArgs.OptimalPath,
-            optimal_path_length: DataCollectionArgs.OptimalPathLength
+            optimal_path_length: DataCollectionArgs.OptimalPathLength,
+            ...getNeurodivergenceFlags()
         }])
     if (error) console.error("Error saving:", error);
         else console.log("Score saved!");
@@ -71,7 +82,8 @@ async function saveConnect4Score(
             final_board: DataCollectionArgs.FinalBoard,
             optimal_moves: DataCollectionArgs.OptimalMoves,
             move_agreement_rate: DataCollectionArgs.MoveAgreementRate,
-            critical_mistakes: DataCollectionArgs.CriticalMistakes
+            critical_mistakes: DataCollectionArgs.CriticalMistakes,
+            ...getNeurodivergenceFlags()
         }])
     if (error) console.error("Error saving:", error);
         else console.log("Connect 4 score saved!");
@@ -105,7 +117,8 @@ async function saveWordleScore(
             time_taken: DataCollectionArgs.EndTime-DataCollectionArgs.StartTime,
             total_guesses: DataCollectionArgs.TotalGuesses,
             guesses: DataCollectionArgs.Guesses,
-            guess_timings: DataCollectionArgs.GuessTimings
+            guess_timings: DataCollectionArgs.GuessTimings,
+            ...getNeurodivergenceFlags()
         }])
     if (error) console.error("Error saving:", error);
         else console.log("Wordle score saved!");

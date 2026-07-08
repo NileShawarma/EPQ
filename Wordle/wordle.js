@@ -36,7 +36,7 @@ function getThemeColour(name, fallback){
 }
 
 function drawBoard(wordle){
-    let bg_col = getThemeColour("--surface", "#2a1f45")
+    let bg_col = getThemeColour("--surface", "#37322a")
 
     setBackground(bg_col)
 
@@ -59,13 +59,13 @@ function drawBoard(wordle){
 }
 
 function drawTile(row, col, letter, state){
-    let empty_col = getThemeColour("--bg", "#1c1430")
-    let border_col = getThemeColour("--border", "#453567")
-    let pending_col = getThemeColour("--accent", "#b388ff")
-    let text_col = getThemeColour("--text", "#ece5f6")
-    let correct_col = "#6fd08c"
-    let present_col = getThemeColour("--accent2", "#ffd166")
-    let absent_col = getThemeColour("--wall", "#352859")
+    let empty_col = getThemeColour("--bg", "#2b2823")
+    let border_col = getThemeColour("--border", "#4d463b")
+    let pending_col = getThemeColour("--accent", "#ddbea9")
+    let text_col = getThemeColour("--text", "#f1e9dd")
+    let correct_col = "#a3b18a"
+    let present_col = getThemeColour("--accent2", "#d4a373")
+    let absent_col = getThemeColour("--wall", "#443d33")
 
     let x = BOARD_PAD + (col * (TILE_SIZE + TILE_GAP))
     let y = BOARD_PAD + (row * (TILE_SIZE + TILE_GAP))
@@ -77,15 +77,15 @@ function drawTile(row, col, letter, state){
     if (state == "correct"){
         fill_col = correct_col
         outline_col = correct_col
-        letter_col = "#1c1430"
+        letter_col = "#2b2823"
     }else if (state == "present"){
         fill_col = present_col
         outline_col = present_col
-        letter_col = "#1c1430"
+        letter_col = "#2b2823"
     }else if (state == "absent"){
         fill_col = absent_col
         outline_col = absent_col
-        letter_col = getThemeColour("--muted", "#8b7aa8")
+        letter_col = getThemeColour("--muted", "#96897a")
     }else if (state == "pending"){
         outline_col = pending_col
     }
@@ -519,3 +519,5 @@ document.getElementById("overlay").addEventListener("click", (e)=>{
         close_popup()
     }
 })
+
+popup_text("welcome to wordle! guess the hidden word before your 6 tries run out. green means the letter is correct, yellow means it's in the word but in the wrong spot, and grey means it's not in the word at all. enter your username, pick a word length, and start typing. click anywhere outside this box to begin!")

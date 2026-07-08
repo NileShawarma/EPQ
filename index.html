@@ -1,1 +1,129 @@
-hi
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARCADE // HOME</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="landing.css" rel="stylesheet">
+  <script type="text/javascript" src="Profile.js" defer></script>
+  <script type="text/javascript" src="landing.js" defer></script>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+
+<div class="shell">
+
+  <header>
+    <div class="logo">
+      <span>A</span><span>R</span><span>C</span><span>A</span><span>D</span><span>E</span>
+    </div>
+    <div class="tagline">// Three games. One skills test. Pick your <span>challenge</span></div>
+    <button class="settings-btn" id="settings-btn" title="Settings">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+      <span>SETTINGS</span>
+    </button>
+    <div class="profile-chip" id="profile-chip"></div>
+  </header>
+
+  <main class="game-grid">
+
+    <a class="game-card" href="Maze/index.html">
+      <div class="card-icon">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+          <path d="M6 6h36v36H6z"/>
+          <path d="M6 16h20M36 16h6M16 16v10M16 26h10M26 26v6M16 36h20M36 26v10"/>
+          <circle cx="11" cy="11" r="2" fill="currentColor" stroke="none"/>
+          <circle cx="37" cy="41" r="2" fill="currentColor" stroke="none"/>
+        </svg>
+      </div>
+      <h2>MAZE</h2>
+      <div class="card-sub">// pathfinding</div>
+      <div class="card-desc">
+        <p>Navigate a procedurally generated labyrinth and race to the exit. Five levels of increasing difficulty — every step you take is counted, so find the shortest route!</p>
+        <span class="card-cta">[ PLAY &rarr; ]</span>
+      </div>
+    </a>
+
+    <a class="game-card" href="Wordle/index.html">
+      <div class="card-icon">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="5" width="12" height="12" rx="2"/>
+          <rect x="19" y="5" width="12" height="12" rx="2" fill="currentColor" fill-opacity="0.35"/>
+          <rect x="33" y="5" width="12" height="12" rx="2"/>
+          <rect x="5" y="19" width="12" height="12" rx="2" fill="currentColor" fill-opacity="0.35"/>
+          <rect x="19" y="19" width="12" height="12" rx="2"/>
+          <rect x="33" y="19" width="12" height="12" rx="2" fill="currentColor" fill-opacity="0.7"/>
+          <rect x="5" y="33" width="12" height="12" rx="2"/>
+          <rect x="19" y="33" width="12" height="12" rx="2"/>
+          <rect x="33" y="33" width="12" height="12" rx="2"/>
+        </svg>
+      </div>
+      <h2>WORDLE</h2>
+      <div class="card-sub">// word logic</div>
+      <div class="card-desc">
+        <p>Guess the hidden word in six tries. Every guess reveals which letters are correct, misplaced or absent. Choose 4, 5 or 6 letter words to test your vocabulary.</p>
+        <span class="card-cta">[ PLAY &rarr; ]</span>
+      </div>
+    </a>
+
+    <a class="game-card" href="C4/index.html">
+      <div class="card-icon">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3">
+          <rect x="4" y="8" width="40" height="34" rx="3"/>
+          <circle cx="14" cy="18" r="3.5"/>
+          <circle cx="24" cy="18" r="3.5"/>
+          <circle cx="34" cy="18" r="3.5" fill="currentColor" fill-opacity="0.7"/>
+          <circle cx="14" cy="30" r="3.5" fill="currentColor" fill-opacity="0.35"/>
+          <circle cx="24" cy="30" r="3.5" fill="currentColor" fill-opacity="0.7"/>
+          <circle cx="34" cy="30" r="3.5" fill="currentColor" fill-opacity="0.35"/>
+        </svg>
+      </div>
+      <h2>CONNECT 4</h2>
+      <div class="card-sub">// strategy</div>
+      <div class="card-desc">
+        <p>Outsmart the AI by dropping pieces to line up four in a row. Four difficulty settings, from a relaxed easy mode all the way up to a ruthless master AI.</p>
+        <span class="card-cta">[ PLAY &rarr; ]</span>
+      </div>
+    </a>
+
+  </main>
+
+  <footer>hover a game to see what it's about . set your username once in <span>settings</span></footer>
+
+</div>
+
+<div class="settings-overlay" id="settings-overlay">
+  <div class="settings-panel">
+    <div class="settings-title">// SETTINGS</div>
+
+    <label class="settings-label" for="settings-username">USERNAME</label>
+    <input class="settings-input" id="settings-username" placeholder="e.g. 21mirzoz" maxlength="8">
+    <div class="settings-hint">// your school username — saved and auto-filled in every game</div>
+    <div class="settings-warning" id="settings-warning"></div>
+
+    <div class="settings-label">ABOUT YOU <span class="optional">(optional — used for research data only)</span></div>
+    <label class="toggle-row">
+      <input type="checkbox" id="settings-adhd">
+      <span class="toggle-box"></span>
+      <span>I have ADHD</span>
+    </label>
+    <label class="toggle-row">
+      <input type="checkbox" id="settings-autism">
+      <span class="toggle-box"></span>
+      <span>I am autistic</span>
+    </label>
+
+    <div class="settings-actions">
+      <button class="btn primary" id="settings-save">[ SAVE ]</button>
+      <button class="btn ghost" id="settings-close">[ CLOSE ]</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

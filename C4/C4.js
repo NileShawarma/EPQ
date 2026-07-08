@@ -717,3 +717,5 @@ document.getElementById("overlay").addEventListener("click", (e)=>{
         close_popup()
     }
 })
+
+popup_text("welcome to connect 4! drop your pieces into the board and line up four in a row - horizontally, vertically or diagonally - before the AI does. use the arrow keys or your mouse to pick a column, and choose a difficulty from the dropdown. enter your username, then click anywhere outside this box to begin!")

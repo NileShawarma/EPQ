@@ -25,6 +25,28 @@ header{
     text-align: center;
 }
 
+.home-link{
+    display: block;
+    width: fit-content;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-decoration: none;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 6px 12px;
+    margin-bottom: 10px;
+    transition: border-color 0.3s, color 0.3s, transform 0.15s;
+}
+.home-link:hover{
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.home-link:active{
+    transform: scale(0.94);
+}
+
 .overlay{
     position: fixed;
     top: 0;
