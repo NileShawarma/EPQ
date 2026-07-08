@@ -1,4 +1,52 @@
-﻿function setBackground(color){
+﻿const IS_CSCLUB_EVENT_RUNNING = true
+let event_details = {
+    //The set session: AI difficulty for each round, played in order
+    "levels": [
+        {difficulty: "easy"},
+        {difficulty: "medium"},
+        {difficulty: "medium"},
+        {difficulty: "hard"},
+        {difficulty: "master"}
+    ],
+    "current_level": -1 // -1 = free play, otherwise the index of the active round
+}
+
+function updateRoundCard(difficultyText){
+    let disp = document.getElementById("round-disp")
+    let label = document.getElementById("round-label")
+
+    if (!disp || !label){
+        return
+    }
+
+    if (IS_CSCLUB_EVENT_RUNNING==true && event_details.current_level >= 0){
+        disp.textContent = `${event_details.current_level+1}/${event_details.levels.length}`
+        label.textContent = `Round · ${difficultyText}`
+    }else{
+        disp.textContent = "FREE"
+        label.textContent = "Play Mode"
+    }
+}
+
+//Builds e.g. "1 round on easy, 2 rounds on medium, ..."
+function describeSessionPlan(){
+    let counts = {}
+    let order = []
+
+    for (let level of event_details.levels){
+        if (counts[level.difficulty] == undefined){
+            order.push(level.difficulty)
+        }
+        counts[level.difficulty] = (counts[level.difficulty] || 0) + 1
+    }
+
+    return order.map((difficulty)=>{
+        let n = counts[difficulty]
+        return `${n} round${n > 1 ? "s" : ""} on ${difficulty}`
+    }).join(", ")
+}
+
+function setBackground(color){
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
     ctx.fillStyle = color
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
@@ -594,6 +642,8 @@ class Connect4 {
         document.getElementById("size-disp").textContent = "7x6"
         document.getElementById("steps").textContent = connect4.DataCollection.TotalMoves
 
+        updateRoundCard(connect4.Difficulty.charAt(0).toUpperCase() + connect4.Difficulty.slice(1))
+
         let msg_line = document.getElementById("msg")
 
         if (!connect4.GameOver){
@@ -718,4 +768,43 @@ document.getElementById("overlay").addEventListener("click", (e)=>{
     }
 })
 
-popup_text("welcome to connect 4! drop your pieces into the board and line up four in a row - horizontally, vertically or diagonally - before the AI does. use the arrow keys or your mouse to pick a column, and choose a difficulty from the dropdown. enter your username, then click anywhere outside this box to begin!")
+async function skillsTest(){
+    document.getElementById("size-sel").disabled = true
+    document.getElementById("new-btn").disabled = true
+
+    await popup_text(`welcome to the connect 4 section of the skills test! you will play ${event_details.levels.length} rounds against the AI: ${describeSessionPlan()}. line up four pieces in a row - horizontally, vertically or diagonally - before the AI does. enter your username, then pick a column with the arrow keys or your mouse. good luck!`)
+
+    for (let i = 0; i < event_details.levels.length; i++){
+        let level = event_details.levels[i]
+
+        event_details.current_level = i
+        //Keep the dropdown in sync - generate_empty_grid reads the difficulty from it
+        document.getElementById("size-sel").value = level.difficulty
+
+        connect4.set_difficulty(level.difficulty)
+        connect4.generate_empty_grid()
+        connect4.heartbeat(connect4)
+        unlock_username_input()
+
+        await new Promise((resolve)=>{
+            connect4.resolveOnGameOver = resolve
+        })
+
+        //Leave the round result on screen before moving on
+        await new Promise(resolve => setTimeout(resolve, 2500))
+    }
+
+    event_details.current_level = -1
+    document.getElementById("size-sel").disabled = false
+    document.getElementById("new-btn").disabled = false
+    if (typeof confetti == "function"){
+        confetti()
+    }
+    await popup_text("congratulations for completing the connect 4 section! you can stay and play freely, but for now head back to the menu to play the other games!")
+}
+
+if (IS_CSCLUB_EVENT_RUNNING==true){
+    skillsTest()
+}else{
+    popup_text("welcome to connect 4! drop your pieces into the board and line up four in a row - horizontally, vertically or diagonally - before the AI does. use the arrow keys or your mouse to pick a column, and choose a difficulty from the dropdown. enter your username, then click anywhere outside this box to begin!")
+}

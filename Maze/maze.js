@@ -22,7 +22,24 @@ let event_details = {
             size: 31
         }
     ],
-    "current_level": 0
+    "current_level": -1 // -1 = free play, otherwise the index of the active round
+}
+
+function updateRoundCard(difficultyText){
+    let disp = document.getElementById("round-disp")
+    let label = document.getElementById("round-label")
+
+    if (!disp || !label){
+        return
+    }
+
+    if (IS_CSCLUB_EVENT_RUNNING==true && event_details.current_level >= 0){
+        disp.textContent = `${event_details.current_level+1}/${event_details.levels.length}`
+        label.textContent = `Round · ${difficultyText}`
+    }else{
+        disp.textContent = "FREE"
+        label.textContent = "Play Mode"
+    }
 }
 function setBackground(color){
     ctx.clearRect(0,0,CANVAS_WIDTH+10,CANVAS_HEIGHT+10)
@@ -301,7 +318,8 @@ async function skillsTest(){
         let level = event_details.levels[i]
         let gen_type = level.type
         let size = level.size
-        
+
+        event_details.current_level = i
         maze.GenerationMode = gen_type
         maze.generate_empty_grid(size, size);
         maze.generate_maze();
@@ -315,6 +333,7 @@ async function skillsTest(){
                 maze.resolveOnGameOver = resolve
             })
     }
+    event_details.current_level = -1
     document.getElementById("size-sel").disabled=false
     document.getElementById("new-btn").disabled=false
     confetti()
@@ -695,6 +714,9 @@ class Maze {
         document.getElementById("size-disp").textContent = `${size}x${size}`
 
         document.getElementById("steps").textContent = maze.DataCollection.TotalMoves
+
+        //Maze difficulty comes from the generation algorithm in use
+        updateRoundCard(maze.GenerationMode == "wilsons" ? "Hard" : "Easy")
 
         drawGrid(1, this.CELL_SIZE, this.CELL_SIZE, "#2a2a3e");
 

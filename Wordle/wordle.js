@@ -1,3 +1,47 @@
+const IS_CSCLUB_EVENT_RUNNING = true
+let event_details = {
+    //The set session: word length for each round, played in order
+    "levels": [
+        {length: 4},
+        {length: 4},
+        {length: 5},
+        {length: 5},
+        {length: 6}
+    ],
+    "current_level": -1 // -1 = free play, otherwise the index of the active round
+}
+
+function updateRoundCard(difficultyText){
+    let disp = document.getElementById("round-disp")
+    let label = document.getElementById("round-label")
+
+    if (!disp || !label){
+        return
+    }
+
+    if (IS_CSCLUB_EVENT_RUNNING==true && event_details.current_level >= 0){
+        disp.textContent = `${event_details.current_level+1}/${event_details.levels.length}`
+        label.textContent = `Round · ${difficultyText}`
+    }else{
+        disp.textContent = "FREE"
+        label.textContent = "Play Mode"
+    }
+}
+
+//Builds e.g. "2 rounds of 4 letter words, 2 rounds of 5 letter words, 1 round of 6 letter words"
+function describeSessionPlan(){
+    let counts = {}
+
+    for (let level of event_details.levels){
+        counts[level.length] = (counts[level.length] || 0) + 1
+    }
+
+    return Object.keys(counts).map((len)=>{
+        let n = counts[len]
+        return `${n} round${n > 1 ? "s" : ""} of ${len} letter words`
+    }).join(", ")
+}
+
 const WORD_BANK = {
     "4": [
         "ABLE", "BIRD", "CALM", "COLD", "DARK", "DUST", "ECHO", "FISH", "FLAG", "GLOW",
@@ -444,6 +488,8 @@ class Wordle {
         document.getElementById("size-disp").textContent = wordle.WordLength
         document.getElementById("steps").textContent = `${wordle.Guesses.length}/${wordle.MAX_GUESSES}`
 
+        updateRoundCard(`${wordle.WordLength} Letters`)
+
         let msg_line = document.getElementById("msg")
 
         if (!wordle.GameOver && wordle.GameStarted){
@@ -520,4 +566,42 @@ document.getElementById("overlay").addEventListener("click", (e)=>{
     }
 })
 
-popup_text("welcome to wordle! guess the hidden word before your 6 tries run out. green means the letter is correct, yellow means it's in the word but in the wrong spot, and grey means it's not in the word at all. enter your username, pick a word length, and start typing. click anywhere outside this box to begin!")
+async function skillsTest(){
+    document.getElementById("size-sel").disabled = true
+    document.getElementById("new-btn").disabled = true
+
+    await popup_text(`welcome to the wordle section of the skills test! you will play ${event_details.levels.length} rounds: ${describeSessionPlan()}. green means the letter is correct, amber means it's in the wrong spot, and grey means it's not in the word. enter your username and start typing. good luck!`)
+
+    for (let i = 0; i < event_details.levels.length; i++){
+        let level = event_details.levels[i]
+
+        event_details.current_level = i
+        document.getElementById("size-sel").value = String(level.length)
+
+        wordle.set_word_length(level.length)
+        wordle.generate_empty_grid()
+        wordle.heartbeat(wordle)
+        unlock_username_input()
+
+        await new Promise((resolve)=>{
+            wordle.resolveOnGameOver = resolve
+        })
+
+        //Leave the result (and the answer on a loss) on screen before moving on
+        await new Promise(resolve => setTimeout(resolve, 2500))
+    }
+
+    event_details.current_level = -1
+    document.getElementById("size-sel").disabled = false
+    document.getElementById("new-btn").disabled = false
+    if (typeof confetti == "function"){
+        confetti()
+    }
+    await popup_text("congratulations for completing the wordle section! you can stay and play freely, but for now head back to the menu to play the other games!")
+}
+
+if (IS_CSCLUB_EVENT_RUNNING==true){
+    skillsTest()
+}else{
+    popup_text("welcome to wordle! guess the hidden word before your 6 tries run out. green means the letter is correct, amber means it's in the word but in the wrong spot, and grey means it's not in the word at all. enter your username, pick a word length, and start typing. click anywhere outside this box to begin!")
+}
