@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ritangle solution archive, organised by round and question.">
+  <title>Ritangle Solutions</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#top" aria-label="Ritangle Solutions home">
+        <span class="brand-mark">R</span>
+        <span>
+          <span class="brand-kicker">Ritangle 2026</span>
+          <span class="brand-title">Solutions archive</span>
+        </span>
+      </a>
+      <div class="header-status"><span class="status-dot"></span> Living archive</div>
+    </div>
+  </header>
+
+  <main id="top" class="page-shell">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Project <span class="pi-mark">\(\pi\)</span> · worked solutions</p>
+        <h1 id="page-title">Explore the<br><em>solution archive.</em></h1>
+        <p class="hero-text">Browse released solutions by round and question. Open any available PDF without leaving this page.</p>
+      </div>
+      <div class="hero-card" aria-label="Archive summary">
+        <div class="hero-card-label">Current release</div>
+        <div class="hero-card-number" id="released-count">4</div>
+        <div class="hero-card-caption">solutions available</div>
+        <div class="hero-card-rule"></div>
+        <div class="hero-card-meta"><span>Round 1</span><strong>1–20</strong></div>
+        <div class="hero-card-meta"><span>Round 2</span><strong>20+</strong></div>
+      </div>
+    </section>
+
+    <section class="toolbar" aria-label="Solution filters">
+      <label class="search-box">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <span class="sr-only">Search solutions</span>
+        <input id="search-input" type="search" placeholder="Search by question or topic..." autocomplete="off">
+      </label>
+      <div class="filter-buttons" role="group" aria-label="Filter by release status">
+        <button class="filter-button active" data-filter="all">All</button>
+        <button class="filter-button" data-filter="released">Released</button>
+        <button class="filter-button" data-filter="pending">Not released</button>
+      </div>
+    </section>
+
+    <div id="empty-state" class="empty-state" hidden>
+      <strong>No matching solutions</strong>
+      <span>Try a different question number or search term.</span>
+    </div>
+
+    <section class="round-section" aria-labelledby="round-one-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-number">01</p>
+          <h2 id="round-one-title">Round one <span>· Questions 1–20</span></h2>
+        </div>
+        <p class="section-note">The first collection of problems</p>
+      </div>
+      <div id="round-one-grid" class="solution-grid"></div>
+    </section>
+
+    <section class="round-section" aria-labelledby="round-two-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-number">02</p>
+          <h2 id="round-two-title">Round two <span>· Questions 20+</span></h2>
+        </div>
+        <p class="section-note">More solutions will appear here</p>
+      </div>
+      <div id="round-two-grid" class="solution-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div>Ritangle 2026 · Project <span class="pi-mark">\(\pi\)</span></div>
+    <div>Solutions are added as they are released.</div>
+  </footer>
+
+  <div id="pdf-modal" class="pdf-modal" role="dialog" aria-modal="true" aria-labelledby="viewer-title" hidden>
+    <div class="modal-backdrop" data-close-viewer></div>
+    <div class="viewer-panel">
+      <div class="viewer-header">
+        <div>
+          <p class="viewer-kicker">Integrated PDF viewer</p>
+          <h2 id="viewer-title">Solution</h2>
+        </div>
+        <div class="viewer-actions">
+          <a id="new-tab-link" class="new-tab-link" href="#" target="_blank" rel="noopener">Open in new tab ↗</a>
+          <a id="download-link" class="download-link" href="#" download>Download PDF</a>
+          <button id="close-viewer" class="close-button" type="button" aria-label="Close PDF viewer">×</button>
+        </div>
+      </div>
+      <iframe id="pdf-frame" title="Solution PDF" src="about:blank"></iframe>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -83,6 +83,11 @@ document.addEventListener("keydown", (e)=>{
     if (e.key == "Escape"){
         closeSettings()
     }
+
+    // Press E from the homepage to enter the Ritangle solutions archive.
+    if (e.key.toLowerCase() == "e" && !settingsOverlay.classList.contains("active") && document.activeElement?.tagName != "INPUT"){
+        window.location.href = "Ritangle/index.html"
+    }
 })
 
 refreshProfileChip()
