@@ -1,16 +1,16 @@
 const solutions = [
-  { round: 1, question: 1, topic: 'Combinatorics', pdf: 'Problem1.pdf' },
-  { round: 1, question: 2, topic: 'Solution available', pdf: 'Problem2.pdf' },
-  { round: 1, question: 3, topic: 'Solution not released yet' },
-  { round: 1, question: 4, topic: 'Solution not released yet' },
-  { round: 1, question: 5, topic: 'Solution not released yet' },
-  { round: 1, question: 6, topic: 'Geometric series', pdf: 'Problem6.pdf' },
-  { round: 1, question: 7, topic: 'Solution not released yet' },
-  { round: 1, question: 8, topic: 'Solution not released yet' },
-  { round: 1, question: 9, topic: 'Solution not released yet' },
-  { round: 1, question: 10, topic: 'Circle geometry', pdf: 'Problem10.pdf' },
-  ...Array.from({ length: 10 }, (_, index) => ({ round: 1, question: index + 11, topic: 'Solution not released yet' })),
-  ...Array.from({ length: 10 }, (_, index) => ({ round: 2, question: index + 21, topic: 'Solution not released yet' }))
+  { round: 1, question: 1, topic: 'Combinatorics', pdf: 'Problem1.pdf', released: true },
+  { round: 1, question: 2, topic: 'Solution available', pdf: 'Problem2.pdf', released: true },
+  { round: 1, question: 3, topic: 'Solution not released yet', pdf: 'Problem3.pdf', released: false },
+  { round: 1, question: 4, topic: 'Solution not released yet', pdf: 'Problem4.pdf', released: false },
+  { round: 1, question: 5, topic: 'Solution not released yet', pdf: 'Problem5.pdf', released: false },
+  { round: 1, question: 6, topic: 'Geometric series', pdf: 'Problem6.pdf', released: true },
+  { round: 1, question: 7, topic: 'Solution not released yet', pdf: 'Problem7.pdf', released: false },
+  { round: 1, question: 8, topic: 'Solution not released yet', pdf: 'Problem8.pdf', released: false },
+  { round: 1, question: 9, topic: 'Solution not released yet', pdf: 'Problem9.pdf', released: false },
+  { round: 1, question: 10, topic: 'Circle geometry', pdf: 'Problem10.pdf', released: true },
+  ...Array.from({ length: 10 }, (_, index) => ({ round: 1, question: index + 11, topic: 'Solution not released yet', pdf: `Problem${index + 11}.pdf`, released: false })),
+  ...Array.from({ length: 10 }, (_, index) => ({ round: 2, question: index + 21, topic: 'Solution not released yet', pdf: `Problem${index + 21}.pdf`, released: false }))
 ];
 
 const state = { filter: 'all', query: '' };
@@ -18,7 +18,7 @@ const grids = { 1: document.querySelector('#round-one-grid'), 2: document.queryS
 const emptyState = document.querySelector('#empty-state');
 
 function card(solution) {
-  const released = Boolean(solution.pdf);
+  const released = solution.released;
   const article = document.createElement('article');
   article.className = `solution-card ${released ? 'released' : 'pending'}`;
   article.dataset.status = released ? 'released' : 'pending';
@@ -42,7 +42,7 @@ function render() {
   [1, 2].forEach(round => {
     grids[round].replaceChildren();
     solutions.filter(solution => solution.round === round).forEach(solution => {
-      const released = Boolean(solution.pdf);
+      const released = solution.released;
       const matchesFilter = state.filter === 'all' || (state.filter === 'released' && released) || (state.filter === 'pending' && !released);
       const matchesQuery = !state.query || `question ${solution.question} ${solution.topic}`.toLowerCase().includes(state.query);
       if (matchesFilter && matchesQuery) {
@@ -89,5 +89,5 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && !document.querySelector('#pdf-modal').hidden) closeViewer();
 });
 
-document.querySelector('#released-count').textContent = solutions.filter(solution => solution.pdf).length;
+document.querySelector('#released-count').textContent = solutions.filter(solution => solution.released).length;
 render();
