@@ -1,4 +1,4 @@
-const IS_CSCLUB_EVENT_RUNNING = true
+const IS_CSCLUB_EVENT_RUNNING = false
 let event_details = {
     //The set session: word length for each round, played in order
     "levels": [
